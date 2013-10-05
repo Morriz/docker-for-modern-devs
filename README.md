@@ -27,7 +27,7 @@ Root password: root
 
 Some ports are exposed for convenience, but no process is listening yet:
 * Port 3000
-* Requests for http(s)://{hostname}/socket.io/ are forwarded to port 8080, also for convenience, but nobody is listening :p
+* Requests for http(s)://{hostname}/socket.io/ are forwarded to port 8080
 
 ## Nginx
 
