@@ -6,6 +6,7 @@ A docker image with a development environment for building bleeding edge web app
 # Usage
 
 Examples:
+
 	# Run with mounted host container
 	$CID=$(docker run -d -v /var/www:/var/www -p 80:80 -p 443:443 -p 3000:3000)
 
@@ -21,6 +22,7 @@ For a complete overview please visit [docker.io](http://www.docker.io/)
 # Packages
 
 The following apps are installed with defaults:
+
 * OpenSSH
 * git
 * node.js (with globals: bower, grunt-cli)
