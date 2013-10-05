@@ -2,7 +2,7 @@
 #
 # VERSION               0.0.1
 
-FROM        ubuntu:12.10
+FROM        ubuntu:precise
 MAINTAINER  Maurice Faber "morriz@idiotz.nl"
 
 # Set the env variable DEBIAN_FRONTEND to noninteractive
@@ -26,7 +26,10 @@ ADD websocket.conf /etc/nginx/sites-available/websocket.conf
 # add redis files
 ADD redis.conf /etc/redis/redis.conf
 
+# Add phpMyAdmin install script
+ADD install_phpmyadmin.sh /root/install_phpmyadmin.sh
+
 # expose ports - 3000 is default node.js app port
-EXPOSE 22 80 443 3306 27017 6379 9000 3000
+EXPOSE 22 80 443 3306 6379 3000
 
 CMD supervisord -n -c /etc/supervisord.conf

@@ -21,14 +21,13 @@ echo "root:root" | chpasswd
 # Configure repos
 apt-get install -y python-software-properties python python-setuptools ruby rubygems
 add-apt-repository -y ppa:chris-lea/node.js
-apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
-add-apt-repository -y 'deb http://mirrors.linsrv.net/mariadb/repo/5.5/ubuntu precise main'
 apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
-echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee -a /etc/apt/sources.list.d/10gen.list
 add-apt-repository -y ppa:nginx/stable
 add-apt-repository -y ppa:ondrej/php5
 apt-key adv --keyserver keyserver.ubuntu.com --recv C7917B12
 echo 'deb http://ppa.launchpad.net/chris-lea/redis-server/ubuntu precise main' > /etc/apt/sources.list.d/chris-lea.list
+apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
+add-apt-repository 'deb http://mirrors.supportex.net/mariadb/repo/10.0/ubuntu precise main'
 apt-get update
 
 # Install Git
@@ -41,32 +40,34 @@ npm install bower -g
 npm install grunt-cli -g
 
 # Install MariaDB - port 3306
+echo mariadb-server mysql-server/root_password password root | debconf-set-selections
+echo mariadb-server mysql-server/root_password_again password root | debconf-set-selections
 apt-get -y install mariadb-server
+sed -i 's/127.0.0.1/0.0.0.0/' /etc/mysql/my.cnf
+echo 'The default MYSQL root password is set to root' > /root/install_readme.txt
 sed -i 's/^innodb_flush_method/#innodb_flush_method/' /etc/mysql/my.cnf
 
 # Install nginx - port 80 + 443
 apt-get -y install nginx
 
 # Install PHP5 and modules
-apt-get -y install php5-fpm php5-mysql php-apc php5-imagick php5-imap php5-mcrypt
-sed -i -e "s/;#cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
-
+apt-get -y install php5-fpm php5-mysql php-apc php5-imagick php5-imap php5-mcrypt php5-xdebug
+sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
+tee /etc/php5/mods-available/xdebug.ini <<EOF
+xdebug.profiler_output_dir=/tmp
+xdebug.profiler_enable_trigger=1
+xdebug.profiler_enable=0
+xdebug.remote_enable=true
+xdebug.remote_connect_back
+xdebug.remote_port=9001
+xdebug.remote_handler=dbgp
+xdebug.remote_autostart=0
+EOF
+ 
 # Install redis
 apt-get -y install redis-server || true
 
-# phpMyAdmin
-echo 'phpmyadmin phpmyadmin/dbconfig-install boolean true' | debconf-set-selections
-echo 'phpmyadmin phpmyadmin/app-password-confirm password root' | debconf-set-selections
-echo 'phpmyadmin phpmyadmin/mysql/admin-pass password root' | debconf-set-selections
-echo 'phpmyadmin phpmyadmin/mysql/app-pass password root' | debconf-set-selections
-echo 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2' | debconf-set-selections
-apt-get -q -y install phpmyadmin
-
-# Install MongoDB
-apt-get -y install apt-utils
-apt-get -y install mongodb-10gen
-
-# Configure nginx for PHP websites - with php-fpm on port 9000
+# Configure nginx for PHP websites -  php-fpm on port 9000
 ln -s /etc/nginx/sites-available/websocket.conf /etc/nginx/sites-enabled/websocket.conf
 echo "cgi.fix_pathinfo = 0;" >> /etc/php5/fpm/php.ini
 mkdir -p /var/www && chown -R www-data:www-data /var/www
