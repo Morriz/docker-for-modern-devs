@@ -15,7 +15,10 @@ ADD server.key /etc/nginx/certificates/
 # install Supervisord conf
 ADD supervisord.conf /etc/supervisord.conf
 
-# RUN as much as possible from file to circumvent aufs 42 layer limit
+# apt-get upgrade fix from https://github.com/dotcloud/docker/issues/1724
+RUN dpkg-divert --local --rename /usr/bin/ischroot && ln -sf /bin/true /usr/bin/ischroot
+
+# RUN as much as possible from file to circumvent aufs 42 layer limit (now 127)
 ADD run.sh /tmp/run.sh
 RUN /bin/bash /tmp/run.sh && rm /tmp/run.sh
 

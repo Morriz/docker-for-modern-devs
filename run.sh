@@ -1,10 +1,9 @@
-# Some fixes:
-dpkg-divert --local --rename --add /sbin/initctl
-ln -s /bin/true /sbin/initctl
+#!/bin/sh
 
 # Update packages
 echo "deb http://archive.ubuntu.com/ubuntu/ precise universe" >> /etc/apt/sources.list
 apt-get update
+apt-get upgrade -y
 
 # install curl, telnet, wget, vim, locate
 apt-get install -y curl telnet wget vim locate
@@ -26,8 +25,6 @@ add-apt-repository -y ppa:nginx/stable
 add-apt-repository -y ppa:ondrej/php5
 apt-key adv --keyserver keyserver.ubuntu.com --recv C7917B12
 echo 'deb http://ppa.launchpad.net/chris-lea/redis-server/ubuntu precise main' > /etc/apt/sources.list.d/chris-lea.list
-apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
-add-apt-repository 'deb http://mirrors.supportex.net/mariadb/repo/10.0/ubuntu precise main'
 apt-get update
 
 # Install Git
@@ -39,13 +36,13 @@ apt-get install -y nodejs
 npm install bower -g
 npm install grunt-cli -g
 
-# Install MariaDB - port 3306
-echo mariadb-server mysql-server/root_password password root | debconf-set-selections
-echo mariadb-server mysql-server/root_password_again password root | debconf-set-selections
-apt-get -y install mariadb-server
+# Install MySQL - port 3306
+echo mysql-server-5.5 mysql-server/root_password password root | debconf-set-selections
+echo mysql-server-5.5 mysql-server/root_password_again password root | debconf-set-selections
+apt-get -y install mysql-server-5.5
 sed -i 's/127.0.0.1/0.0.0.0/' /etc/mysql/my.cnf
 echo 'The default MYSQL root password is set to root' > /root/install_readme.txt
-sed -i 's/^innodb_flush_method/#innodb_flush_method/' /etc/mysql/my.cnf
+#sed -i 's/^innodb_flush_method/#innodb_flush_method/' /etc/mysql/my.cnf
 
 # Install nginx - port 80 + 443
 apt-get -y install nginx

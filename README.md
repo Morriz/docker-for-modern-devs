@@ -28,7 +28,7 @@ The following apps are installed with defaults:
 * node.js (with globals: bower, grunt-cli)
 * nginx (config supplied)
 * php-fpm
-* MariaDB (MySQL fork)
+* MySQL
 * phpMyAdmin
 * Redis (config supplied)
 * Supervisord
